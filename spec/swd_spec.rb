@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe SWD do
-  its(:cache) { should == SWD::Cache }
+  its(:cache) { should be_a SWD::Cache }
 
   describe '#discover!' do
     it 'should return SWD::Response' do

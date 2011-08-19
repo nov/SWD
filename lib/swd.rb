@@ -14,3 +14,6 @@ require 'swd/cache'
 require 'swd/exception'
 require 'swd/resource'
 require 'swd/response'
+
+# NOTE: Default Cache doesn't cache anything.
+SWD.cache = SWD::Cache.new
