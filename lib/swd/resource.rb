@@ -9,7 +9,7 @@ module SWD
     include AttrRequired
     attr_required :principal, :service, :host, :path
 
-    class ContentExpired < Exception; end
+    class Expired < Exception; end
 
     def initialize(attributes = {})
       required_attributes.each do |key|
@@ -23,7 +23,7 @@ module SWD
     def discover!
       SWD.cache.fetch(cache_key, @cache_options) do
         handle_response do
-          HTTPClient.get endpoint.to_s
+          HTTPClient.get_content endpoint.to_s
         end
       end
     end
@@ -33,37 +33,42 @@ module SWD
         :principal => principal,
         :service => service
       }.to_query, nil]
+    rescue URI::Error => e
+      raise Exception.new(e.message)
     end
 
     private
 
     def handle_response
-      res = yield
-      case res.status
-      when 200
-        res = JSON.parse(res.body).with_indifferent_access
-        if redirect = res[:SWD_service_redirect]
-          redirect_to redirect[:location], redirect[:expires]
-        else
-          Response.new res
-        end
-      when 400
-        raise BadRequest.new(res)
-      when 401
-        raise Unauthorized.new(res)
-      when 403
-        raise Forbidden.new(res)
-      when 404
-        raise NotFound.new(res)
+      res = JSON.parse(yield).with_indifferent_access
+      if redirect = res[:SWD_service_redirect]
+        redirect_to redirect[:location], redirect[:expires]
       else
-        raise HttpError.new(res.code, res)
+        Response.new res
       end
+    rescue HTTPClient::BadResponseError => e
+      case e.res.try(:status)
+      when nil
+        raise Exception.new(e.message)
+      when 400
+        raise BadRequest.new('Bad Request', res)
+      when 401
+        raise Unauthorized.new('Unauthorized', res)
+      when 403
+        raise Forbidden.new('Forbidden', res)
+      when 404
+        raise NotFound.new('Not Found', res)
+      else
+        raise HttpError.new(e.res.status, e.res.reason, res)
+      end
+    rescue JSON::ParserError, OpenSSL::SSL::SSLError, SocketError => e
+      raise Exception.new(e.message)
     end
 
     def redirect_to(location, expires)
       uri = URI.parse(location)
       @host, @path = uri.host, uri.path
-      raise ContentExpired if expires && expires.to_i < Time.now.utc.to_i
+      raise Expired if expires && expires.to_i < Time.now.utc.to_i
       discover!
     end
 
