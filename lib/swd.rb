@@ -1,0 +1,16 @@
+module SWD
+  def self.cache=(cache)
+    @@cache = cache
+  end
+  def self.cache
+    @@cache
+  end
+  def self.discover!(attributes = {})
+    Resource.new(attributes).discover!
+  end
+end
+
+require 'swd/cache'
+require 'swd/exception'
+require 'swd/resource'
+require 'swd/response'
