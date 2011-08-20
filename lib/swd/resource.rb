@@ -16,12 +16,11 @@ module SWD
         self.send "#{key}=", attributes[key]
       end
       @path ||= '/.well-known/simple-web-discovery'
-      @cache_options = attributes[:cache] || {}
       attr_missing!
     end
 
-    def discover!
-      SWD.cache.fetch(cache_key, @cache_options) do
+    def discover!(cache_options = {})
+      SWD.cache.fetch(cache_key, cache_options) do
         handle_response do
           HTTPClient.get_content endpoint.to_s
         end
@@ -44,7 +43,7 @@ module SWD
       if redirect = res[:SWD_service_redirect]
         redirect_to redirect[:location], redirect[:expires]
       else
-        Response.new res
+        to_response_object(res)
       end
     rescue HTTPClient::BadResponseError => e
       case e.res.try(:status)
@@ -63,6 +62,10 @@ module SWD
       end
     rescue JSON::ParserError, OpenSSL::SSL::SSLError, SocketError => e
       raise Exception.new(e.message)
+    end
+
+    def to_response_object(hash)
+      Response.new hash
     end
 
     def redirect_to(location, expires)

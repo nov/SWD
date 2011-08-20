@@ -6,7 +6,7 @@ module SWD
     @@cache
   end
   def self.discover!(attributes = {})
-    Resource.new(attributes).discover!
+    Resource.new(attributes).discover!(attributes[:cache])
   end
 end
 
