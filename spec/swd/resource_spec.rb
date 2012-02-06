@@ -155,7 +155,11 @@ describe SWD::Resource do
     its(:endpoint) { should be_instance_of URI::HTTPS }
     context 'with URI::HTTP builder' do
       before do
+        @original_url_builder = SWD.url_builder
         SWD.url_builder = URI::HTTP
+      end
+      after do
+        SWD.url_builder = @original_url_builder
       end
       its(:endpoint) { should be_instance_of URI::HTTP }
     end
