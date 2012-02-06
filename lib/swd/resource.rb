@@ -22,7 +22,7 @@ module SWD
     end
 
     def endpoint
-      SWD.url_builder.build [nil, host, 443, path, {
+      SWD.url_builder.build [nil, host, nil, path, {
         :principal => principal,
         :service => service
       }.to_query, nil]
