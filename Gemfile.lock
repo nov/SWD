@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    swd (0.0.7)
+    swd (0.0.8)
       activesupport (>= 3)
       attr_required (>= 0.0.3)
       httpclient (>= 2.2.1)

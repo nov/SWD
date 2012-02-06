@@ -1,4 +1,9 @@
 require 'logger'
+require 'digest/md5'
+require 'json'
+require 'active_support/core_ext'
+require 'httpclient'
+require 'attr_required'
 
 module SWD
   VERSION = ::File.read(
@@ -53,6 +58,13 @@ module SWD
   end
   def self.http_config(&block)
     @@http_config ||= block
+  end
+
+  def self.url_builder
+    @@url_builder ||= URI::HTTPS
+  end
+  def self.url_builder=(builder)
+    @@url_builder = builder
   end
 end
 

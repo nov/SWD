@@ -1,9 +1,3 @@
-require 'digest/md5'
-require 'json'
-require 'httpclient'
-require 'active_support/core_ext'
-require 'attr_required'
-
 module SWD
   class Resource
     include AttrRequired
@@ -28,7 +22,7 @@ module SWD
     end
 
     def endpoint
-      URI::HTTPS.build [nil, host, 443, path, {
+      SWD.url_builder.build [nil, host, 443, path, {
         :principal => principal,
         :service => service
       }.to_query, nil]
