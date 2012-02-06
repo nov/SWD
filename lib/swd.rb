@@ -48,13 +48,11 @@ module SWD
       :agent_name => "SWD (#{VERSION})"
     )
     _http_client_.request_filter << Debugger::RequestFilter.new if SWD.debugging?
-    if @@http_config
-      @@http_config.call(_http_client_)
-    end
+    http_config.try(:call, _http_client_)
     _http_client_
   end
   def self.http_config(&block)
-    @@http_config = block
+    @@http_config ||= block
   end
 end
 
