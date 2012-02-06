@@ -42,6 +42,14 @@ module SWD
     self.debugging = original
   end
   self.debugging = false
+
+  def self.http_client
+    _http_client_ = HTTPClient.new(
+      :agent_name => "SWD (#{VERSION})"
+    )
+    _http_client_.request_filter << Debugger::RequestFilter.new if SWD.debugging?
+    _http_client_
+  end
 end
 
 require 'swd/cache'

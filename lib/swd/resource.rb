@@ -22,7 +22,7 @@ module SWD
     def discover!(cache_options = {})
       SWD.cache.fetch(cache_key, cache_options) do
         handle_response do
-          http_client.get_content endpoint.to_s
+          SWD.http_client.get_content endpoint.to_s
         end
       end
     end
@@ -37,14 +37,6 @@ module SWD
     end
 
     private
-
-    def http_client
-      _http_client_ = HTTPClient.new(
-        :agent_name => "SWD (#{VERSION})"
-      )
-      _http_client_.request_filter << Debugger::RequestFilter.new if SWD.debugging?
-      _http_client_
-    end
 
     def handle_response
       res = JSON.parse(yield).with_indifferent_access

@@ -70,41 +70,41 @@ describe SWD::Resource do
     end
 
     describe 'error handling' do
-      let(:http_client) { resource.send(:http_client) }
       before do
         module SWD
-          class Resource
-            def http_client
-              @http_client ||= HTTPClient.new
+          class << self
+            def http_client_with_cached
+              @http_client ||= http_client_without_cached
             end
+            alias_method_chain :http_client, :cached
           end
         end
       end
 
       context 'when invalid SSL cert' do
         it do
-          http_client.should_receive(:get_content).and_raise(OpenSSL::SSL::SSLError)
+          SWD.http_client.should_receive(:get_content).and_raise(OpenSSL::SSL::SSLError)
           expect { res = resource.discover! }.should raise_error SWD::Exception
         end
       end
 
       context 'when invalid JSON' do
         it do
-          http_client.should_receive(:get_content).and_raise(JSON::ParserError)
+          SWD.http_client.should_receive(:get_content).and_raise(JSON::ParserError)
           expect { res = resource.discover! }.should raise_error SWD::Exception
         end
       end
 
       context 'when SocketError' do
         it do
-          http_client.should_receive(:get_content).and_raise(SocketError)
+          SWD.http_client.should_receive(:get_content).and_raise(SocketError)
           expect { res = resource.discover! }.should raise_error SWD::Exception
         end
       end
 
       context 'when BadResponseError without response' do
         it do
-          http_client.should_receive(:get_content).and_raise(HTTPClient::BadResponseError.new(''))
+          SWD.http_client.should_receive(:get_content).and_raise(HTTPClient::BadResponseError.new(''))
           expect { res = resource.discover! }.should raise_error SWD::Exception
         end
       end
