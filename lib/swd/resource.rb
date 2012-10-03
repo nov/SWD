@@ -55,7 +55,7 @@ module SWD
       else
         raise HttpError.new(e.res.status, e.res.reason, res)
       end
-    rescue JSON::ParserError, OpenSSL::SSL::SSLError, SocketError, Errno::ECONNREFUSED => e
+    rescue JSON::ParserError, OpenSSL::SSL::SSLError, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => e
       raise Exception.new(e.message)
     end
 
