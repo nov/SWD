@@ -17,7 +17,7 @@ describe SWD::Resource do
     it "should require #{key}" do
       expect do
         SWD::Resource.new attributes.merge(key => nil)
-      end.should raise_error AttrRequired::AttrMissing
+      end.to raise_error AttrRequired::AttrMissing
     end
   end
 
@@ -49,7 +49,7 @@ describe SWD::Resource do
       context 'when expired' do
         it 'should return SWD::Response' do
           mock_json resource.endpoint, 'redirect_expired' do
-            expect { res = resource.discover! }.should raise_error SWD::Resource::Expired
+            expect { res = resource.discover! }.to raise_error SWD::Resource::Expired
           end
         end
       end
@@ -84,35 +84,35 @@ describe SWD::Resource do
       context 'when invalid SSL cert' do
         it do
           SWD.http_client.should_receive(:get_content).and_raise(OpenSSL::SSL::SSLError)
-          expect { res = resource.discover! }.should raise_error SWD::Exception
+          expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end
 
       context 'when invalid JSON' do
         it do
           SWD.http_client.should_receive(:get_content).and_raise(JSON::ParserError)
-          expect { res = resource.discover! }.should raise_error SWD::Exception
+          expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end
 
       context 'when SocketError' do
         it do
           SWD.http_client.should_receive(:get_content).and_raise(SocketError)
-          expect { res = resource.discover! }.should raise_error SWD::Exception
+          expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end
 
       context 'when BadResponseError without response' do
         it do
           SWD.http_client.should_receive(:get_content).and_raise(HTTPClient::BadResponseError.new(''))
-          expect { res = resource.discover! }.should raise_error SWD::Exception
+          expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end
 
       context 'when bad request' do
         it 'should raise SWD::BadRequest' do
           mock_json resource.endpoint, 'blank', :status => 400 do
-            expect { res = resource.discover! }.should raise_error SWD::BadRequest
+            expect { res = resource.discover! }.to raise_error SWD::BadRequest
           end
         end
       end
@@ -120,7 +120,7 @@ describe SWD::Resource do
       context 'when unauthorized' do
         it 'should raise SWD::Unauthorized' do
           mock_json resource.endpoint, 'blank', :status => 401 do
-            expect { res = resource.discover! }.should raise_error SWD::Unauthorized
+            expect { res = resource.discover! }.to raise_error SWD::Unauthorized
           end
         end
       end
@@ -128,7 +128,7 @@ describe SWD::Resource do
       context 'when forbidden' do
         it 'should raise SWD::Forbidden' do
           mock_json resource.endpoint, 'blank', :status => 403 do
-            expect { res = resource.discover! }.should raise_error SWD::Forbidden
+            expect { res = resource.discover! }.to raise_error SWD::Forbidden
           end
         end
       end
@@ -136,7 +136,7 @@ describe SWD::Resource do
       context 'when not found' do
         it 'should raise SWD::NotFound' do
           mock_json resource.endpoint, 'blank', :status => 404 do
-            expect { res = resource.discover! }.should raise_error SWD::NotFound
+            expect { res = resource.discover! }.to raise_error SWD::NotFound
           end
         end
       end
@@ -144,7 +144,7 @@ describe SWD::Resource do
       context 'when other error happened' do
         it 'should raise SWD::HttpError' do
           mock_json resource.endpoint, 'blank', :status => 500 do
-            expect { res = resource.discover! }.should raise_error SWD::HttpError
+            expect { res = resource.discover! }.to raise_error SWD::HttpError
           end
         end
       end

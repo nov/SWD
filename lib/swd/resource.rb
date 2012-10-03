@@ -1,12 +1,13 @@
 module SWD
   class Resource
-    include AttrRequired
+    include AttrRequired, AttrOptional
     attr_required :principal, :service, :host, :path
+    attr_optional :port
 
     class Expired < Exception; end
 
     def initialize(attributes = {})
-      required_attributes.each do |key|
+      (optional_attributes + required_attributes).each do |key|
         self.send "#{key}=", attributes[key]
       end
       @path ||= '/.well-known/simple-web-discovery'
@@ -22,7 +23,7 @@ module SWD
     end
 
     def endpoint
-      SWD.url_builder.build [nil, host, nil, path, {
+      SWD.url_builder.build [nil, host, port, path, {
         :principal => principal,
         :service => service
       }.to_query, nil]
@@ -64,7 +65,7 @@ module SWD
 
     def redirect_to(location, expires)
       uri = URI.parse(location)
-      @host, @path = uri.host, uri.path
+      @host, @path, @port = uri.host, uri.path, uri.port
       raise Expired if expires && expires.to_i < Time.now.utc.to_i
       discover!
     end

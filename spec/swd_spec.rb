@@ -20,6 +20,66 @@ describe SWD do
         ).should be_a SWD::Response
       end
     end
+
+    context 'when port specified' do
+      it 'should use it' do
+        mock_json "https://example.com:8080/.well-known/simple-web-discovery", 'success', :query => {
+          :principal => 'mailto:joe@example.com',
+          :service => 'urn:adatum.com:calendar'
+        } do
+          SWD.discover!(
+            :principal => 'mailto:joe@example.com',
+            :service => 'urn:adatum.com:calendar',
+            :host => 'example.com',
+            :port => 8080
+          ).should be_a SWD::Response
+        end
+      end
+
+      context 'when redirected to different host' do
+        context 'with port' do
+          it 'should success' do
+            mock_json "https://example.com:8080/.well-known/simple-web-discovery", 'redirect_with_port', :query => {
+              :principal => 'mailto:joe@example.com',
+              :service => 'urn:adatum.com:calendar'
+            } do
+              mock_json "https://swd.proseware.com:8080/swd_server", 'success', :query => {
+                :principal => 'mailto:joe@example.com',
+                :service => 'urn:adatum.com:calendar'
+              } do
+                SWD.discover!(
+                  :principal => 'mailto:joe@example.com',
+                  :service => 'urn:adatum.com:calendar',
+                  :host => 'example.com',
+                  :port => 8080
+                ).should be_a SWD::Response
+              end
+            end
+          end
+        end
+
+        context 'without port' do
+          it 'should success' do
+            mock_json "https://example.com:8080/.well-known/simple-web-discovery", 'redirect', :query => {
+              :principal => 'mailto:joe@example.com',
+              :service => 'urn:adatum.com:calendar'
+            } do
+              mock_json "https://swd.proseware.com/swd_server", 'success', :query => {
+                :principal => 'mailto:joe@example.com',
+                :service => 'urn:adatum.com:calendar'
+              } do
+                SWD.discover!(
+                  :principal => 'mailto:joe@example.com',
+                  :service => 'urn:adatum.com:calendar',
+                  :host => 'example.com',
+                  :port => 8080
+                ).should be_a SWD::Response
+              end
+            end
+          end
+        end
+      end
+    end
   end
 
   describe '.debug!' do

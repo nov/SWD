@@ -4,6 +4,7 @@ require 'json'
 require 'active_support/core_ext'
 require 'httpclient'
 require 'attr_required'
+require 'attr_optional'
 
 module SWD
   VERSION = ::File.read(
