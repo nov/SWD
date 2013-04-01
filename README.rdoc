@@ -2,7 +2,9 @@
 
 SWD (Simple Web Discovery) Client Library
 
-{<img src="https://secure.travis-ci.org/nov/SWD.png" />}[http://travis-ci.org/nov/swd]
+NOTE:
+SWD was designed to be the core of OpenID Connect Discovery, but it's replaced with WebFinger.
+So I'm no longer supporting this gem.
 
 == Installation
 
