@@ -2,7 +2,7 @@
 
 SWD (Simple Web Discovery) Client Library
 
-{<img src="https://secure.travis-ci.org/nov/swd.png" />}[http://travis-ci.org/nov/swd]
+{<img src="https://secure.travis-ci.org/nov/SWD.png" />}[http://travis-ci.org/nov/swd]
 
 == Installation
 
