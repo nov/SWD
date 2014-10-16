@@ -8,7 +8,7 @@ describe SWD::Debugger::RequestFilter do
 
   describe '#filter_request' do
     it 'should log request' do
-      SWD.logger.should_receive(:info).with(
+      expect(SWD.logger).to receive(:info).with(
         "======= [SWD] HTTP REQUEST STARTED =======\n" +
         request.dump
       )
@@ -18,7 +18,7 @@ describe SWD::Debugger::RequestFilter do
 
   describe '#filter_response' do
     it 'should log response' do
-      SWD.logger.should_receive(:info).with(
+      expect(SWD.logger).to receive(:info).with(
         "--------------------------------------------------\n" +
         response.dump +
         "\n======= [SWD] HTTP REQUEST FINISHED ======="

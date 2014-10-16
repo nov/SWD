@@ -38,7 +38,7 @@ describe SWD::Resource do
 
     context 'when redirected' do
       it 'should follow redirect' do
-        resource.should_receive(:redirect_to).with(
+        expect(resource).to receive(:redirect_to).with(
           'https://swd.proseware.com/swd_server', nil
         )
         mock_json resource.endpoint, 'redirect' do
@@ -70,41 +70,57 @@ describe SWD::Resource do
     end
 
     describe 'error handling' do
-      before do
+      before(:all) do
         module SWD
           class << self
             def http_client_with_cached
               @http_client ||= http_client_without_cached
             end
             alias_method_chain :http_client, :cached
+
+            def clear_http_client!
+              @http_client = nil
+            end
+          end
+        end
+      end
+
+      after(:all) do
+        module SWD
+          class << self
+            def http_client_with_cache_cleared
+              @http_client = nil
+              http_client_without_cache_cleared
+            end
+            alias_method_chain :http_client, :cache_cleared
           end
         end
       end
 
       context 'when invalid SSL cert' do
         it do
-          SWD.http_client.should_receive(:get_content).and_raise(OpenSSL::SSL::SSLError)
+          expect(SWD.http_client).to receive(:get_content).and_raise(OpenSSL::SSL::SSLError)
           expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end
 
       context 'when invalid JSON' do
         it do
-          SWD.http_client.should_receive(:get_content).and_raise(JSON::ParserError)
+          expect(SWD.http_client).to receive(:get_content).and_raise(JSON::ParserError)
           expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end
 
       context 'when SocketError' do
         it do
-          SWD.http_client.should_receive(:get_content).and_raise(SocketError)
+          expect(SWD.http_client).to receive(:get_content).and_raise(SocketError)
           expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end
 
       context 'when BadResponseError without response' do
         it do
-          SWD.http_client.should_receive(:get_content).and_raise(HTTPClient::BadResponseError.new(''))
+          expect(SWD.http_client).to receive(:get_content).and_raise(HTTPClient::BadResponseError.new(''))
           expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end

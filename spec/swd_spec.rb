@@ -4,7 +4,7 @@ describe SWD do
   after { SWD.debugging = false }
 
   its(:logger) { should be_a Logger }
-  its(:debugging?) { should be_false }
+  its(:debugging?) { should == false }
   its(:cache) { should be_a SWD::Cache }
 
   describe '#discover!' do
@@ -84,23 +84,23 @@ describe SWD do
 
   describe '.debug!' do
     before { SWD.debug! }
-    its(:debugging?) { should be_true }
+    its(:debugging?) { should == true }
   end
 
   describe '.debug' do
     it 'should enable debugging within given block' do
       SWD.debug do
-        SWD.debugging?.should be_true
+        SWD.debugging?.should == true
       end
-      SWD.debugging?.should be_false
+      SWD.debugging?.should == false
     end
 
     it 'should not force disable debugging' do
       SWD.debug!
       SWD.debug do
-        SWD.debugging?.should be_true
+        SWD.debugging?.should == true
       end
-      SWD.debugging?.should be_true
+      SWD.debugging?.should == true
     end
   end
 
