@@ -18,9 +18,7 @@ module WebMockHelper
 
   def request_for(options = {})
     request = {}
-    if options[:query]
-      request[:query] = options[:query]
-    end
+    request[:query] = options[:query]
     request
   end
 
