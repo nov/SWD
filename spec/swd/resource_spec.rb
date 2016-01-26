@@ -73,14 +73,12 @@ describe SWD::Resource do
       before(:all) do
         module SWD
           class << self
-            def http_client_with_cached
-              @http_client ||= http_client_without_cached
+            module HttpClientWithCached
+              def http_client
+                @http_client ||= super
+              end
             end
-            alias_method_chain :http_client, :cached
-
-            def clear_http_client!
-              @http_client = nil
-            end
+            prepend HttpClientWithCached
           end
         end
       end
@@ -88,11 +86,13 @@ describe SWD::Resource do
       after(:all) do
         module SWD
           class << self
-            def http_client_with_cache_cleared
-              @http_client = nil
-              http_client_without_cache_cleared
+            module HttpClientWithCacheCleared
+              def http_client
+                @http_client = nil
+                super
+              end
             end
-            alias_method_chain :http_client, :cache_cleared
+            prepend HttpClientWithCacheCleared
           end
         end
       end
