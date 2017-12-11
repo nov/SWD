@@ -1,3 +1,4 @@
+require 'json'
 require 'logger'
 require 'openssl'
 require 'active_support'
