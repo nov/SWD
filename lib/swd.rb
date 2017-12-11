@@ -1,6 +1,5 @@
 require 'logger'
-require 'digest/md5'
-require 'json'
+require 'openssl'
 require 'active_support'
 require 'active_support/core_ext'
 require 'httpclient'

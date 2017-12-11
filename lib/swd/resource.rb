@@ -71,7 +71,7 @@ module SWD
     end
 
     def cache_key
-      md5 = Digest::MD5.hexdigest [
+      md5 = OpenSSL::Digest::MD5.hexdigest [
         principal,
         service,
         host
