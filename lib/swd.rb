@@ -10,7 +10,7 @@ require 'attr_optional'
 module SWD
   VERSION = ::File.read(
     ::File.join(::File.dirname(__FILE__), '../VERSION')
-  )
+  ).strip
 
   def self.cache=(cache)
     @@cache = cache
