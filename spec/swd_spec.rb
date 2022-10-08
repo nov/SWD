@@ -108,11 +108,11 @@ describe SWD do
     context 'with http_config' do
       before do
         SWD.http_config do |config|
-          config.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          config.ssl.verify = false
         end
       end
       it 'should configure http_client' do
-        SWD.http_client.ssl_config.verify_mode.should == OpenSSL::SSL::VERIFY_NONE
+        SWD.http_client.ssl.verify.should be_falsy
       end
     end
   end

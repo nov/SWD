@@ -97,31 +97,10 @@ describe SWD::Resource do
         end
       end
 
-      context 'when invalid SSL cert' do
+      context 'when Faraday::Error without response' do
         it do
-          expect(SWD.http_client).to receive(:get_content).and_raise(OpenSSL::SSL::SSLError)
-          expect { res = resource.discover! }.to raise_error SWD::Exception
-        end
-      end
-
-      context 'when invalid JSON' do
-        it do
-          expect(SWD.http_client).to receive(:get_content).and_raise(JSON::ParserError)
-          expect { res = resource.discover! }.to raise_error SWD::Exception
-        end
-      end
-
-      context 'when SocketError' do
-        it do
-          expect(SWD.http_client).to receive(:get_content).and_raise(SocketError)
-          expect { res = resource.discover! }.to raise_error SWD::Exception
-        end
-      end
-
-      context 'when BadResponseError without response' do
-        it do
-          expect(SWD.http_client).to receive(:get_content).and_raise(HTTPClient::BadResponseError.new(''))
-          expect { res = resource.discover! }.to raise_error SWD::Exception
+          expect(SWD.http_client).to receive(:get).and_raise(Faraday::Error)
+          expect { res = resource.discover! }.to raise_error Faraday::Error
         end
       end
 

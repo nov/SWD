@@ -17,7 +17,7 @@ module SWD
     def discover!(cache_options = {})
       SWD.cache.fetch(cache_key, cache_options) do
         handle_response do
-          SWD.http_client.get_content endpoint.to_s
+          SWD.http_client.get endpoint.to_s
         end
       end
     end
@@ -34,33 +34,27 @@ module SWD
     private
 
     def handle_response
-      res = JSON.parse(yield).with_indifferent_access
-      if redirect = res[:SWD_service_redirect]
+      json = yield.body.with_indifferent_access
+      if redirect = json[:SWD_service_redirect]
         redirect_to redirect[:location], redirect[:expires]
       else
-        to_response_object(res)
+        Response.new json
       end
-    rescue HTTPClient::BadResponseError => e
-      case e.res.try(:status)
+    rescue Faraday::Error => e
+      case e.response_status
       when nil
-        raise Exception.new(e.message)
+        raise e
       when 400
-        raise BadRequest.new('Bad Request', res)
+        raise BadRequest.new('Bad Request', e.response_body)
       when 401
-        raise Unauthorized.new('Unauthorized', res)
+        raise Unauthorized.new('Unauthorized', e.response_body)
       when 403
-        raise Forbidden.new('Forbidden', res)
+        raise Forbidden.new('Forbidden', e.response_body)
       when 404
-        raise NotFound.new('Not Found', res)
+        raise NotFound.new('Not Found', e.response_body)
       else
-        raise HttpError.new(e.res.status, e.res.reason, res)
+        raise HttpError.new(e.response_status, e.response_body, e.response_body)
       end
-    rescue JSON::ParserError, OpenSSL::SSL::SSLError, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => e
-      raise Exception.new(e.message)
-    end
-
-    def to_response_object(hash)
-      Response.new hash
     end
 
     def redirect_to(location, expires)
