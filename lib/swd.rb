@@ -3,7 +3,8 @@ require 'logger'
 require 'openssl'
 require 'active_support'
 require 'active_support/core_ext'
-require 'httpclient'
+require 'faraday'
+require 'faraday/follow_redirects'
 require 'attr_required'
 require 'attr_optional'
 
@@ -51,17 +52,14 @@ module SWD
   self.debugging = false
 
   def self.http_client
-    _http_client_ = HTTPClient.new(
-      :agent_name => "SWD (#{VERSION})"
-    )
-
-    # NOTE: httpclient gem seems stopped maintaining root certtificate set, use OS default.
-    _http_client_.ssl_config.clear_cert_store
-    _http_client_.ssl_config.cert_store.set_default_paths
-
-    _http_client_.request_filter << Debugger::RequestFilter.new if debugging?
-    http_config.try(:call, _http_client_)
-    _http_client_
+    Faraday.new(headers: {user_agent: "SWD #{VERSION}"}) do |faraday|
+      faraday.response :raise_error
+      faraday.response :json
+      faraday.response :follow_redirects
+      faraday.response :logger, WebFinger.logger if debugging?
+      faraday.adapter Faraday.default_adapter
+      http_config.try(:call, faraday)
+    end
   end
   def self.http_config(&block)
     @@http_config ||= block
@@ -79,6 +77,5 @@ require 'swd/cache'
 require 'swd/exception'
 require 'swd/resource'
 require 'swd/response'
-require 'swd/debugger'
 
 SWD.cache = SWD::Cache.new

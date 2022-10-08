@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe SWD::HttpError do
   subject do
-    SWD::HttpError.new 400, 'Bad Request', HTTP::Message.new_response('')
+    SWD::HttpError.new 400, 'Bad Request', 'Message'
   end
 
   its(:status)   { should == 400 }
   its(:message)  { should == 'Bad Request' }
-  its(:response) { should be_a HTTP::Message }
+  its(:response) { should == 'Message' }
 end
 
 describe SWD::BadRequest do
