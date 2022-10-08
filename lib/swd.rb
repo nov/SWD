@@ -56,7 +56,7 @@ module SWD
       faraday.response :raise_error
       faraday.response :json
       faraday.response :follow_redirects
-      faraday.response :logger, WebFinger.logger if debugging?
+      faraday.response :logger, SWD.logger if debugging?
       faraday.adapter Faraday.default_adapter
       http_config.try(:call, faraday)
     end
