@@ -100,7 +100,7 @@ describe SWD::Resource do
       context 'when Faraday::Error without response' do
         it do
           expect(SWD.http_client).to receive(:get).and_raise(Faraday::Error)
-          expect { res = resource.discover! }.to raise_error Faraday::Error
+          expect { res = resource.discover! }.to raise_error SWD::Exception
         end
       end
 
