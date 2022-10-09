@@ -38,7 +38,7 @@ module SWD
       if redirect = json[:SWD_service_redirect]
         redirect_to redirect[:location], redirect[:expires]
       else
-        Response.new json
+        to_response_object json
       end
     rescue Faraday::Error => e
       case e.response_status
@@ -55,6 +55,11 @@ module SWD
       else
         raise HttpError.new(e.response_status, e.response_body, e.response_body)
       end
+    end
+
+    # NOTE: overwritten in openid_connect gem.
+    def to_response_object(json)
+      Response.new json
     end
 
     def redirect_to(location, expires)
