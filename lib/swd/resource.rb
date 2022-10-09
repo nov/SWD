@@ -43,7 +43,7 @@ module SWD
     rescue Faraday::Error => e
       case e.response_status
       when nil
-        raise e
+        raise Exception.new e
       when 400
         raise BadRequest.new('Bad Request', e.response_body)
       when 401
